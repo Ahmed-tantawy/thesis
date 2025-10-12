@@ -1,0 +1,167 @@
+Timing is on.
+=============================================
+Baseline Performance Test - Catalog Queries
+Testing with cache warm-up
+=============================================
+
+Phase 1: Cold start (first run, cache empty)
+---------------------------------------------
+Query 1: Category lookup (cold)
+ count 
+-------
+  2444
+(1 row)
+
+Time: 7.383 ms
+
+Query 2: Multi-category search (cold)
+ count 
+-------
+  6227
+(1 row)
+
+Time: 7.558 ms
+
+Query 3: Heavy aggregation (cold)
+ product_category_name  | products | avg_weight 
+------------------------+----------+------------
+ cama_mesa_banho        |     3029 |    2456.41
+ esporte_lazer          |     2867 |    2024.67
+ moveis_decoracao       |     2657 |    3008.27
+ beleza_saude           |     2444 |    1434.79
+ utilidades_domesticas  |     2335 |    3020.79
+ automotivo             |     1900 |    2654.65
+ informatica_acessorios |     1639 |     898.38
+ brinquedos             |     1411 |    1869.36
+ relogios_presentes     |     1329 |     509.29
+ telefonia              |     1134 |     236.51
+(10 rows)
+
+Time: 10.023 ms
+
+=============================================
+Phase 2: Warm cache (repeat 10 times)
+=============================================
+Running queries 10 times to warm cache...
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.270 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.229 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.210 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.208 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.207 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.212 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.208 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.204 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.204 ms
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.204 ms
+
+Query 1: Category lookup (warm cache)
+ count 
+-------
+  2444
+(1 row)
+
+Time: 0.203 ms
+
+=============================================
+Phase 3: Cache Statistics
+=============================================
+          table_name          | disk_reads | cache_hits | cache_hit_ratio_pct 
+------------------------------+------------+------------+---------------------
+ order_payments               |          0 |          0 |                   0
+ order_items                  |          0 |          0 |                   0
+ orders                       |          0 |          0 |                   0
+ customers                    |          0 |          0 |                   0
+ products                     |          0 |          0 |                   0
+ sellers                      |          0 |          0 |                   0
+ product_category_translation |          0 |          0 |                   0
+ geolocation                  |          0 |          0 |                   0
+ order_reviews                |          0 |          0 |                   0
+(9 rows)
+
+Time: 4.135 ms
+
+--- Index Usage Statistics ---
+ schemaname | tablename | indexname | index_scans | tuples_read | tuples_fetched 
+------------+-----------+-----------+-------------+-------------+----------------
+(0 rows)
+
+Time: 1.750 ms
+
+--- Database-wide Cache Hit Ratio ---
+ total_disk_reads | total_cache_hits | overall_cache_hit_ratio_pct 
+------------------+------------------+-----------------------------
+                0 |                0 |                           0
+(1 row)
+
+Time: 0.634 ms
+
+=============================================
+Phase 4: Query Plan Analysis
+=============================================
+--- Explain Plan for Category Lookup ---
+                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.29..12.45 rows=50 width=48) (actual time=0.007..0.027 rows=50 loops=1)
+   Buffers: shared hit=12
+   ->  Index Scan using idx_products_category on products  (cost=0.29..590.48 rows=2427 width=48) (actual time=0.007..0.023 rows=50 loops=1)
+         Index Cond: ((product_category_name)::text = 'beleza_saude'::text)
+         Buffers: shared hit=12
+ Planning:
+   Buffers: shared hit=26 read=2
+ Planning Time: 0.410 ms
+ Execution Time: 0.033 ms
+(9 rows)
+
+Time: 1.092 ms
+
+Test completed!
