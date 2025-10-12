@@ -1,0 +1,221 @@
+Timing is on.
+SET
+Time: 0.183 ms
+=============================================
+Scenario 1: Product Catalog Browsing
+Testing read-heavy queries on products table
+=============================================
+
+ pg_stat_reset 
+---------------
+ 
+(1 row)
+
+Time: 1.242 ms
+Test 1.1: Simple product lookup by category
+            product_id            | product_category_name 
+----------------------------------+-----------------------
+ e3e020af31d4d89d2602272b315c3f6e | beleza_saude
+ c5d8079278e912d7e3b6beb48ecb56e8 | beleza_saude
+ 36555a2f528d7b2a255c504191445d39 | beleza_saude
+ e586ebb6022265ae1eea38f46ffe3ead | beleza_saude
+ 75b4372e69a42f8ae1d908c076f547b2 | beleza_saude
+ 3569d4374a919941a50f57371b1dc93d | beleza_saude
+ 3a6a0247ced9dcb444b46caafdcdd368 | beleza_saude
+ adf591c625cb265c12bc6749d3a2f757 | beleza_saude
+ 50556c630443502c11acde1c320fe278 | beleza_saude
+ 88d2c501ec765f5d7e8038fa6aab0e62 | beleza_saude
+ b29ca3d3127057c43ef4b364bbe360ea | beleza_saude
+ e07f6e9343cad06f34d0a7a09eeac4d7 | beleza_saude
+ dd783a33bc94bef9c728611320d559e7 | beleza_saude
+ c752f2bc46ad4b389290cf5828a1db62 | beleza_saude
+ 6a61a5d77a8571a0646e8c0f75f572f4 | beleza_saude
+ a18a23a783fb7576a8f0f6fbc2ae2b58 | beleza_saude
+ d10abea506594de1dd5ea21851f94062 | beleza_saude
+ aba0932cedf32b2a7b6b832f11769613 | beleza_saude
+ 10d43b23591dde746f32fe6a7beb5bfb | beleza_saude
+ bc4a074ab7a7ff14e98fa64671a79dc0 | beleza_saude
+ e84fb20fe338824c220166d3cd562cbd | beleza_saude
+ 3d649f0e12c7b5f9ec7e00f538cc13f3 | beleza_saude
+ 8729e9bc4b7f0422448d80ed35ae329d | beleza_saude
+ 6bb81626d06fafb4d7eab61ac9ed70c6 | beleza_saude
+ 2efbce46d36d9af306d4300db163b276 | beleza_saude
+ 7e437c1d65a7baab7e7ca6c9f4e98b84 | beleza_saude
+ 012dd0e1c1f14325ee35f06748329355 | beleza_saude
+ 89904bec271974d069685a6568091c8a | beleza_saude
+ 9f22d89800e8f59f79d50aa9d732f5e2 | beleza_saude
+ dbb00dd9b017066946537423958bd4ea | beleza_saude
+ fe849745fcdc6e1d6864539a2b13197f | beleza_saude
+ 7193329f650facb78de86a2e0b771e2f | beleza_saude
+ 12827caf723c4ff8030d64dcffe3cdab | beleza_saude
+ 0c03a930e654a5f1ea08f95a5c67d076 | beleza_saude
+ bcb8826a092a057aedd93bb71d67c24d | beleza_saude
+ 860dd3635c61aba2d7ddea90b7d471b2 | beleza_saude
+ 4a37bc772078a013df64fd661ae5ee6c | beleza_saude
+ ecac3b74dce5ab6c6a7b9eda9216cfcc | beleza_saude
+ 2a27bdf5d36c733df107a86e44370254 | beleza_saude
+ b1060f179d7f706565e347fbe00bf1b8 | beleza_saude
+ 74c94099baac38d7d352195da981626a | beleza_saude
+ 7a33d7a1a85cb7db38bacbcc212a6013 | beleza_saude
+ b3bcd6f54c943fecf8f51e0b988e5cc9 | beleza_saude
+ 9746ab6f7694c5e2fc9fe14befbb5c18 | beleza_saude
+ 13387d462f74993d258b62f8f85fd9b8 | beleza_saude
+ ae6476ef6cf588ccb0bd009b62359b97 | beleza_saude
+ 0f2ee8171adfc13c81f69ff4dcb2b635 | beleza_saude
+ dbbda25f6b7c74669cf2203b2e3139a0 | beleza_saude
+ f0a8b25a0a4f80f60eed4e1fdc3d477c | beleza_saude
+ c20e9c8a7361bfa0d6530ab73075921b | beleza_saude
+(50 rows)
+
+Time: 1.570 ms
+
+Test 1.2: Product search with multiple filters
+            product_id            | product_category_name | product_weight_g | volume_cm3 
+----------------------------------+-----------------------+------------------+------------
+ 1336ffed1eaf9f489f9f5656f7e6fd81 | beleza_saude          |              100 |       4608
+ 57e1815b050566a793e010162f765cdb | beleza_saude          |              100 |       4500
+ 62bfda7b1a58cc9a485cb563b99ea48f | esporte_lazer         |              100 |       1920
+ 55706d564fb262a790f8a7e5096f12ba | beleza_saude          |              100 |       1360
+ 5562c7c7b08835a354f9c65cd4f1d9c3 | beleza_saude          |              100 |        990
+ 71bd8f5de551c71f6ff1386868d57526 | esporte_lazer         |              100 |       1666
+ 8fad1e543221d7d6867e756d4bc5e286 | beleza_saude          |              100 |        880
+ 25300f04b80a57680ca191c7d4ea64e1 | beleza_saude          |              100 |       1360
+ 2fea0f2cec6b6324a277d4a61c2ed2c6 | beleza_saude          |              100 |       1331
+ c8a06a6cf1dbd09f3273d65d3dc2da99 | beleza_saude          |              100 |       1056
+ 017066298c485af1e19e55363f5dc362 | esporte_lazer         |              100 |        836
+ af0d0d1521e30e05b1cfc77192c685b6 | relogios_presentes    |              100 |       3264
+ a4cb01ef37cd2734263f1ea9f1f8e7e4 | relogios_presentes    |              100 |       2100
+ 1a658f920c35086bb2f6421f240608bd | beleza_saude          |              100 |       4500
+ ffa7e0cbe11656d11a117b534bb1db27 | beleza_saude          |              100 |       5832
+ b582be000fb3a394254623d5dff60f56 | beleza_saude          |              100 |       1584
+ 8b39be5bbb8a4585ed19cacbf4162c27 | esporte_lazer         |              100 |       1056
+ f3456a2585f6774a74e39abccf24a9b0 | beleza_saude          |              100 |       4500
+ 94b8c08d077273b9896ca6461d4e6e1e | esporte_lazer         |              100 |      16560
+ a6e0877ffaf0725d90e31e4350a3276e | esporte_lazer         |              100 |       3000
+ ae9e33c1ac2b32c7518516756f7b80a5 | beleza_saude          |              100 |       2112
+ 5f4717c32cb957e5faf8d9271dce3fd5 | beleza_saude          |              100 |       6859
+ 4daa0faaa4ddd47f39c5de509edc4a32 | beleza_saude          |              100 |        600
+ 9e2ee57a77fedecd33b6914e9cf61199 | beleza_saude          |              100 |       4096
+ 1ec3e93251df2e23babb7daa30c52496 | esporte_lazer         |              100 |       2816
+ 12bc892d6fff0dc42c8177f3665ef00e | beleza_saude          |              100 |       4368
+ 0a9a9c25c5a06532d1766e00db833a7f | beleza_saude          |              100 |        720
+ 64d9a8168b3776844d8e4dac2a0efca3 | esporte_lazer         |              100 |      15625
+ 576327798e521889c9a2b63d732cfcef | esporte_lazer         |              100 |       6480
+ 328885b1f935efd7c06eef905173ec44 | esporte_lazer         |              100 |       2112
+ 8b1490c8e82581bd050b41bd709a6364 | beleza_saude          |              100 |        924
+ 87dc701592a3d9c9b7b02e6b004f7764 | esporte_lazer         |              100 |        850
+ c615ac0ef96d723029051d29d7cd2d16 | beleza_saude          |              100 |       5760
+ ef06c0458c76196646fe25444b793139 | beleza_saude          |              100 |        924
+ 8e436253e3c4eeacc3b2757482517200 | beleza_saude          |              100 |       1600
+ da8b72e46537fe5af3ade4bc6120f05c | beleza_saude          |              100 |       2304
+ ba461381a6bf526c5e970d435541eb2a | esporte_lazer         |              100 |       4080
+ 87a9ce65cf1cfe4f8a81d3c25f0b8874 | esporte_lazer         |              100 |       1056
+ 6ec26b3516fecd18cda3001a9c48a242 | beleza_saude          |              100 |        990
+ de26d4014234181730a1143f75dad0e7 | beleza_saude          |              100 |       6006
+ 1058e78d49ac73bc388e05633c15f47b | beleza_saude          |              100 |       1920
+ 5dd65915a87e9031993b18e481a3cbe5 | esporte_lazer         |              100 |       3750
+ cbf5cf4e5d906cda4c6d91d5b7b15e8b | beleza_saude          |              100 |       4500
+ 9b1954fdd0f9b4ef4ee2d267ac9de4bd | beleza_saude          |              100 |       2299
+ 991d9793febfe022d5db970595a99008 | esporte_lazer         |              100 |       3600
+ 0926524e4f3783f1b0e35c09d5fe13cd | beleza_saude          |              100 |       1200
+ 214f3ddd6bf0b37fcc394a822e319a30 | beleza_saude          |              100 |        990
+ 8e0fe01ccda36af7936ac8564cf8aee7 | beleza_saude          |              100 |        990
+ 00fefaf41156bb4b0d850fb27da97897 | esporte_lazer         |              100 |       6480
+ dadc0d260b9adadab31c487f1749b9ad | esporte_lazer         |              100 |        880
+ 567f4f60d4e44c92dd00ecd0920ce6b1 | esporte_lazer         |              100 |       3136
+ 35c5e00f6a23366ce44aaedc05da015d | esporte_lazer         |              100 |      10000
+ f2af004352a06a99dca765596240cbc3 | beleza_saude          |              100 |       2175
+ 9e809bfbd8f6387e9bfbccd76087c82e | esporte_lazer         |              100 |       2560
+ 9bf55e9d85e0b309f79e92927449d211 | beleza_saude          |              100 |       4500
+ 99fb0293e181af6a2b692fef4ddac420 | esporte_lazer         |              100 |       3600
+ fce345e86ad30c0a8de7f92f71ecb4cc | beleza_saude          |              100 |       7500
+ d1eae8696e58fd64c47a433ad605f2a4 | beleza_saude          |              100 |       4807
+ eb66cf8eb505819c951a23b4714fcd39 | relogios_presentes    |              100 |       2100
+ 154e7e31ebfa092203795c972e5804a6 | beleza_saude          |              100 |       4500
+ 5acfd4d25279c8414a02e70a92743c34 | esporte_lazer         |              100 |       4032
+ 11b66b9c3298383e765fa69bdfd86e5f | esporte_lazer         |              100 |       1768
+ 252dc1fbd22786a5305623453f8eaf8b | beleza_saude          |              100 |       4368
+ 2343570575e2990224008969445d7402 | relogios_presentes    |              100 |        528
+ 656e6ea7d86cf0008e67b693d33cc357 | beleza_saude          |              100 |        990
+ 73f125f683118508d664a53ab01bab34 | esporte_lazer         |              100 |        528
+ 7c0ff36de8af6f43eabd036729ff64a1 | relogios_presentes    |              100 |        640
+ 20daef67faad9f39084ec8812b1dc6b4 | beleza_saude          |              100 |        750
+ b1b79859f1babe1145fdd1b24eabb217 | esporte_lazer         |              100 |       4096
+ 06605f576f31279bada4552051c88fa8 | beleza_saude          |              100 |       1235
+ 898ce6644632917718b73d9141c28344 | esporte_lazer         |              100 |       1280
+ 81d2fa5b1805af5f9e0d08af321b2f35 | beleza_saude          |              100 |       4500
+ 84e3161e8dd15fb8ae229e8d507c9736 | beleza_saude          |              100 |        650
+ 096b00d9037146606b19d614cd67ab65 | beleza_saude          |              100 |        880
+ 63888810573fd78e60644cdf803cd2fa | esporte_lazer         |              100 |       2816
+ 77e54bccbb383f52f76910f34d4cda43 | beleza_saude          |              100 |        352
+ 9a46ea3c561cf8075d59a39256461e73 | esporte_lazer         |              100 |       1875
+ 2a303002260ff8749ef2a438413895bf | beleza_saude          |              100 |       1596
+ 757b6da408dc043a090dd89a90e8d4b9 | beleza_saude          |              100 |       1600
+ c1124abcc7a081c6f00f97c9135522fb | beleza_saude          |              100 |       1768
+ 11ae52c87d8eb9c9c9ce5ed52b8efbbe | beleza_saude          |              100 |       1360
+ 947f602dbb2ac7b6795cc5b1f0508a52 | beleza_saude          |              100 |       1360
+ 8db4ee0e7e76083bd7d2d8ba3085b3a2 | relogios_presentes    |              100 |       2100
+ 59911136c59b2dd04ddce80d592b55f3 | esporte_lazer         |              100 |       1056
+ 88a82488ded06b62a95df35c384cabfb | esporte_lazer         |              100 |       1904
+ 89f1e78cec2da8a550bc341cfc36c066 | esporte_lazer         |              100 |       3328
+ ddc9cfae6aff4793d37c7224d3ee1648 | esporte_lazer         |              100 |       1760
+ 06ce9c3e61c7a07f872f8317a7dc534d | beleza_saude          |              100 |       1408
+ e3025f416b18907e09b3df602c3eca2b | beleza_saude          |              100 |       1404
+ fbcd62530875b193a5e21728242d77a4 | relogios_presentes    |              100 |       2100
+ abf31c4162c38c15d44f1c62de528fc2 | esporte_lazer         |              100 |       1040
+ 1ac94144a305b4bc370804ca0d290490 | beleza_saude          |              100 |        576
+ 8f2a61109d01cbda2cc6cdea233b1102 | esporte_lazer         |              100 |       4096
+ 8382f9e2420867093a37399229d3dc10 | beleza_saude          |              100 |        990
+ 9a8706b8c060b16e5f0d2925f20bc35b | esporte_lazer         |              100 |      15625
+ bb4580d57d11614d91c391c557e27372 | beleza_saude          |              100 |       7500
+ d6fcbd88428353e7eb9584e8cc51afc0 | beleza_saude          |              100 |       8448
+ d332776387e352fbd83df0136cf05db1 | esporte_lazer         |              100 |       2560
+ 3c61c2007c26ec50365d6c385e088ca1 | esporte_lazer         |              100 |       6426
+ c974196c0f8fa41b6475a72f67b8df99 | beleza_saude          |              100 |        650
+(100 rows)
+
+Time: 5.606 ms
+
+Test 1.3: Products with dimensions (NULL handling)
+ total_products | products_with_weight | products_with_dimensions | avg_weight 
+----------------+----------------------+--------------------------+------------
+           2444 |                 2444 |                     2444 |    1434.79
+(1 row)
+
+Time: 1.520 ms
+
+Test 1.4: Top 10 heaviest products per category
+ product_category_name | products | heaviest_product_g | avg_weight_g 
+-----------------------+----------+--------------------+--------------
+ cama_mesa_banho       |     3029 |              40425 |      2456.41
+ eletroportateis       |      231 |              30000 |      4012.40
+ casa_construcao       |      225 |              30000 |      3395.72
+ consoles_games        |      317 |              30000 |       636.66
+ eletrodomesticos      |      370 |              30000 |      1979.65
+ bebes                 |      918 |              30000 |      3655.20
+ esporte_lazer         |     2867 |              30000 |      2024.67
+ beleza_saude          |     2444 |              30000 |      1434.79
+ ferramentas_jardim    |      753 |              30000 |      3103.78
+ moveis_quarto         |       45 |              30000 |      9997.22
+(10 rows)
+
+Time: 10.465 ms
+
+=============================================
+Cache Hit Ratio Analysis
+=============================================
+         metric          | value | size_read 
+-------------------------+-------+-----------
+ Heap Blocks Read        |     0 | 0 bytes
+ Heap Blocks Hit (cache) |     0 | 0 bytes
+(2 rows)
+
+Time: 5.664 ms
+      ?column?       | round 
+---------------------+-------
+ Cache Hit Ratio (%) |      
+(1 row)
+
+Time: 0.611 ms
+
+Test completed!
