@@ -1,0 +1,116 @@
+Timing is on.
+=============================================
+Write Performance Testing
+Testing INSERT/UPDATE overhead with indexes
+=============================================
+
+Phase 1: Current State (All Indexes Present)
+---------------------------------------------
+ total_indexes 
+---------------
+            21
+(1 row)
+
+Time: 5.756 ms
+
+Test 1.1: Single INSERT into orders
+psql:scripts/performance_tests/04_write_performance_test.sql:74: NOTICE:  Single INSERT duration: 3.054 ms
+DO
+Time: 11.821 ms
+
+Test 1.2: Batch INSERT (100 orders)
+psql:scripts/performance_tests/04_write_performance_test.sql:90: ERROR:  duplicate key value violates unique constraint "orders_pkey"
+DETAIL:  Key (order_id)=(batch_test_1_1760271920.016798) already exists.
+Time: 33.980 ms
+DELETE 0
+Time: 9.071 ms
+
+Test 1.3: UPDATE performance
+                                                                                    QUERY PLAN                                                                                    
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on orders  (cost=9.36..11.59 rows=0 width=0) (actual time=0.031..0.031 rows=0 loops=1)
+   ->  Nested Loop  (cost=9.36..11.59 rows=1 width=121) (actual time=0.030..0.031 rows=0 loops=1)
+         ->  HashAggregate  (cost=8.94..8.95 rows=1 width=90) (actual time=0.030..0.031 rows=0 loops=1)
+               Group Key: ("ANY_subquery".order_id)::text
+               Batches: 1  Memory Usage: 24kB
+               ->  Subquery Scan on "ANY_subquery"  (cost=7.81..8.94 rows=1 width=90) (actual time=0.029..0.030 rows=0 loops=1)
+                     ->  Limit  (cost=7.81..8.93 rows=1 width=33) (actual time=0.029..0.030 rows=0 loops=1)
+                           ->  Bitmap Heap Scan on orders orders_1  (cost=7.81..8.93 rows=1 width=33) (actual time=0.029..0.029 rows=0 loops=1)
+                                 Recheck Cond: ((order_purchase_timestamp >= '2018-10-01 00:00:00'::timestamp without time zone) AND ((order_status)::text = 'processing'::text))
+                                 ->  BitmapAnd  (cost=7.81..7.81 rows=1 width=0) (actual time=0.028..0.029 rows=0 loops=1)
+                                       ->  Bitmap Index Scan on idx_orders_purchase_date  (cost=0.00..3.56 rows=289 width=0) (actual time=0.004..0.004 rows=4 loops=1)
+                                             Index Cond: (order_purchase_timestamp >= '2018-10-01 00:00:00'::timestamp without time zone)
+                                       ->  Bitmap Index Scan on idx_orders_status  (cost=0.00..4.00 rows=348 width=0) (actual time=0.023..0.023 rows=311 loops=1)
+                                             Index Cond: ((order_status)::text = 'processing'::text)
+         ->  Index Scan using orders_pkey on orders  (cost=0.42..2.64 rows=1 width=39) (never executed)
+               Index Cond: ((order_id)::text = ("ANY_subquery".order_id)::text)
+ Planning Time: 0.282 ms
+ Execution Time: 0.057 ms
+(18 rows)
+
+Time: 0.608 ms
+UPDATE 0
+Time: 0.187 ms
+
+=============================================
+Phase 2: Temporarily Drop Optional Indexes
+=============================================
+Dropping optional indexes...
+DROP INDEX
+Time: 24.570 ms
+DROP INDEX
+Time: 1.511 ms
+DROP INDEX
+Time: 1.329 ms
+DROP INDEX
+Time: 1.442 ms
+Optional indexes dropped.
+
+Test 2.1: Single INSERT without optional indexes
+psql:scripts/performance_tests/04_write_performance_test.sql:176: NOTICE:  Single INSERT (fewer indexes) duration: 0.194 ms
+DO
+Time: 0.829 ms
+
+Test 2.2: Batch INSERT without optional indexes
+psql:scripts/performance_tests/04_write_performance_test.sql:191: ERROR:  duplicate key value violates unique constraint "orders_pkey"
+DETAIL:  Key (order_id)=(batch_test_noindex_1_1760271920.091405) already exists.
+Time: 10.865 ms
+DELETE 0
+Time: 4.468 ms
+
+=============================================
+Phase 3: Restore Indexes
+=============================================
+Recreating optimal indexes...
+CREATE INDEX
+Time: 57.593 ms
+CREATE INDEX
+Time: 28.911 ms
+CREATE INDEX
+Time: 56.042 ms
+CREATE INDEX
+Time: 61.120 ms
+ANALYZE
+Time: 73.272 ms
+ANALYZE
+Time: 65.470 ms
+Indexes restored and analyzed.
+
+=============================================
+Write Performance Summary
+=============================================
+Current index configuration:
+  tablename  | index_count | total_index_size 
+-------------+-------------+------------------
+ order_items |           4 | 17 MB
+ orders      |           7 | 34 MB
+(2 rows)
+
+Time: 0.846 ms
+
+Key Findings:
+1. Compare Phase 1 vs Phase 2 INSERT times
+2. Index overhead = (Time with indexes - Time without) / Time without
+3. Evaluate if read performance gains justify write overhead
+
+Test completed!
