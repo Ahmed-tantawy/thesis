@@ -1,0 +1,312 @@
+======================================================================
+PostgreSQL Concurrency and Load Testing
+======================================================================
+Start time: 2025-10-12 14:34:59.501173
+Database: ecommerce_olist
+Queries to test: 3
+
+
+######################################################################
+# Query: catalog_lookup
+######################################################################
+
+======================================================================
+Testing: catalog_lookup with 1 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.14 seconds
+  Successful queries: 5/5
+  Failed queries: 0
+  Queries per second: 37.01
+
+Query Performance:
+  Average: 0.75 ms
+  Median: 0.22 ms
+  Min: 0.19 ms
+  Max: 2.77 ms
+  Std Dev: 1.13 ms
+
+======================================================================
+Testing: catalog_lookup with 5 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.04 seconds
+  Successful queries: 25/25
+  Failed queries: 0
+  Queries per second: 563.05
+
+Query Performance:
+  Average: 0.47 ms
+  Median: 0.20 ms
+  Min: 0.16 ms
+  Max: 1.73 ms
+  Std Dev: 0.55 ms
+
+======================================================================
+Testing: catalog_lookup with 10 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.06 seconds
+  Successful queries: 50/50
+  Failed queries: 0
+  Queries per second: 901.70
+
+Query Performance:
+  Average: 0.59 ms
+  Median: 0.29 ms
+  Min: 0.15 ms
+  Max: 2.29 ms
+  Std Dev: 0.63 ms
+
+======================================================================
+Testing: catalog_lookup with 20 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.08 seconds
+  Successful queries: 100/100
+  Failed queries: 0
+  Queries per second: 1251.57
+
+Query Performance:
+  Average: 0.73 ms
+  Median: 0.59 ms
+  Min: 0.13 ms
+  Max: 3.58 ms
+  Std Dev: 0.66 ms
+
+======================================================================
+Testing: catalog_lookup with 50 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.21 seconds
+  Successful queries: 250/250
+  Failed queries: 0
+  Queries per second: 1175.67
+
+Query Performance:
+  Average: 1.98 ms
+  Median: 1.36 ms
+  Min: 0.10 ms
+  Max: 23.16 ms
+  Std Dev: 2.35 ms
+
+
+######################################################################
+# Query: customer_orders
+######################################################################
+
+======================================================================
+Testing: customer_orders with 1 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.05 seconds
+  Successful queries: 5/5
+  Failed queries: 0
+  Queries per second: 103.30
+
+Query Performance:
+  Average: 1.46 ms
+  Median: 0.32 ms
+  Min: 0.24 ms
+  Max: 6.17 ms
+  Std Dev: 2.63 ms
+
+======================================================================
+Testing: customer_orders with 5 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.05 seconds
+  Successful queries: 25/25
+  Failed queries: 0
+  Queries per second: 521.23
+
+Query Performance:
+  Average: 0.74 ms
+  Median: 0.22 ms
+  Min: 0.16 ms
+  Max: 3.27 ms
+  Std Dev: 1.09 ms
+
+======================================================================
+Testing: customer_orders with 10 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.06 seconds
+  Successful queries: 50/50
+  Failed queries: 0
+  Queries per second: 824.73
+
+Query Performance:
+  Average: 0.73 ms
+  Median: 0.35 ms
+  Min: 0.14 ms
+  Max: 3.02 ms
+  Std Dev: 0.85 ms
+
+======================================================================
+Testing: customer_orders with 20 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.09 seconds
+  Successful queries: 100/100
+  Failed queries: 0
+  Queries per second: 1136.12
+
+Query Performance:
+  Average: 0.97 ms
+  Median: 0.68 ms
+  Min: 0.12 ms
+  Max: 4.81 ms
+  Std Dev: 0.99 ms
+
+======================================================================
+Testing: customer_orders with 50 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.16 seconds
+  Successful queries: 250/250
+  Failed queries: 0
+  Queries per second: 1540.04
+
+Query Performance:
+  Average: 1.02 ms
+  Median: 0.73 ms
+  Min: 0.12 ms
+  Max: 4.56 ms
+  Std Dev: 0.93 ms
+
+
+######################################################################
+# Query: order_analytics
+######################################################################
+
+======================================================================
+Testing: order_analytics with 1 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.13 seconds
+  Successful queries: 5/5
+  Failed queries: 0
+  Queries per second: 37.18
+
+Query Performance:
+  Average: 19.06 ms
+  Median: 14.92 ms
+  Min: 13.59 ms
+  Max: 35.67 ms
+  Std Dev: 9.42 ms
+
+======================================================================
+Testing: order_analytics with 5 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.27 seconds
+  Successful queries: 25/25
+  Failed queries: 0
+  Queries per second: 93.83
+
+Query Performance:
+  Average: 38.40 ms
+  Median: 33.73 ms
+  Min: 17.41 ms
+  Max: 68.38 ms
+  Std Dev: 15.69 ms
+
+======================================================================
+Testing: order_analytics with 10 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.72 seconds
+  Successful queries: 50/50
+  Failed queries: 0
+  Queries per second: 69.00
+
+Query Performance:
+  Average: 109.19 ms
+  Median: 69.05 ms
+  Min: 25.04 ms
+  Max: 319.09 ms
+  Std Dev: 83.85 ms
+
+======================================================================
+Testing: order_analytics with 20 concurrent threads
+======================================================================
+
+Results:
+  Total time: 0.82 seconds
+  Successful queries: 100/100
+  Failed queries: 0
+  Queries per second: 121.94
+
+Query Performance:
+  Average: 121.66 ms
+  Median: 100.80 ms
+  Min: 22.61 ms
+  Max: 339.26 ms
+  Std Dev: 77.77 ms
+
+======================================================================
+Testing: order_analytics with 50 concurrent threads
+======================================================================
+
+Results:
+  Total time: 1.90 seconds
+  Successful queries: 250/250
+  Failed queries: 0
+  Queries per second: 131.51
+
+Query Performance:
+  Average: 295.05 ms
+  Median: 325.82 ms
+  Min: 23.70 ms
+  Max: 618.76 ms
+  Std Dev: 145.90 ms
+
+
+======================================================================
+SUMMARY REPORT
+======================================================================
+
+CATALOG_LOOKUP:
+Threads    QPS        Avg(ms)    P95(ms)    P99(ms)   
+--------------------------------------------------
+1          37.01      0.75       2.77       2.77      
+5          563.05     0.47       1.52       1.73      
+10         901.70     0.59       1.90       2.29      
+20         1251.57    0.73       2.22       3.58      
+50         1175.67    1.98       5.67       9.86      
+
+CUSTOMER_ORDERS:
+Threads    QPS        Avg(ms)    P95(ms)    P99(ms)   
+--------------------------------------------------
+1          103.30     1.46       6.17       6.17      
+5          521.23     0.74       2.85       3.27      
+10         824.73     0.73       2.52       3.02      
+20         1136.12    0.97       3.22       4.81      
+50         1540.04    1.02       3.12       3.91      
+
+ORDER_ANALYTICS:
+Threads    QPS        Avg(ms)    P95(ms)    P99(ms)   
+--------------------------------------------------
+1          37.18      19.06      35.67      35.67     
+5          93.83      38.40      67.28      68.38     
+10         69.00      109.19     285.22     319.09    
+20         121.94     121.66     266.29     339.26    
+50         131.51     295.05     502.53     564.27    
+
+
+Test completed: 2025-10-12 14:35:19.362594
+======================================================================
