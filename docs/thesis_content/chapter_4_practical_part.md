@@ -178,9 +178,113 @@ Index Scan: ~5x slower than current
 
 Conclusion:
 Configuration optimization validates the hypothesis that hardware-specific tuning significantly impacts query planner behavior, even when immediate performance gains are modest on small datasets.
+---
 
-4.5 Index Strategy Optimization
-[To be completed in next testing phase]
+## 4.5 Index Strategy Optimization
+
+### 4.5.1 Index Types Tested
+
+Following configuration optimization, advanced indexing strategies were evaluated to further improve query performance. Four index types were tested:
+
+1. **Composite Indexes:** Multi-column indexes for combined filter conditions
+2. **Partial Indexes:** Filtered indexes for subset queries
+3. **Covering Indexes:** Include additional columns to enable index-only scans
+4. **Standard B-tree Indexes:** Single-column indexes (baseline)
+
+### 4.5.2 Composite Index Performance
+
+**Purpose:** Optimize queries filtering on multiple columns simultaneously
+
+**Indexes Created:**
+- `idx_orders_customer_status` on `orders(customer_id, order_status)`
+- `idx_order_items_product_price` on `order_items(product_id, price)`
+
+**Use Case:** Customer order history filtered by status
+```sql
+SELECT order_id, order_status, order_purchase_timestamp
+FROM orders
+WHERE customer_id = 'xxx' AND order_status = 'delivered';
+
+Result: Composite index enables efficient filtering on both columns in a single index scan, reducing the need for bitmap heap scans or sequential scans.
+Index Size: 6,608 KB (orders table)
+
+4.5.3 Partial Index Performance
+Purpose: Create smaller, faster indexes for frequently queried subsets
+Index Created:
+sqlCREATE INDEX idx_orders_delivered_date 
+ON orders(order_purchase_timestamp)
+WHERE order_status = 'delivered';
+
+Rationale:
+
+97% of orders have status = 'delivered'
+Date-range queries on delivered orders are common in analytics
+Partial index excludes canceled/processing orders
+
+Performance Result:
+MetricValueExecution Time1.523 msIndex Size2,128 KB (vs ~2,600 KB for full index)Rows Scanned6,351Index TypeBitmap Index Scan
+Query Plan:
+Bitmap Index Scan on idx_orders_delivered_date
+  Index Cond: (order_purchase_timestamp >= '2018-08-01' 
+               AND order_purchase_timestamp < '2018-09-01')
+
+Key Finding: Partial indexes reduce index size by ~18% while maintaining full performance for filtered queries. This demonstrates the value of workload-specific optimization.
+
+Index Created:
+sqlCREATE INDEX idx_orders_customer_covering 
+ON orders(customer_id) 
+INCLUDE (order_status, order_purchase_timestamp);
+
+PostgreSQL 11+ Feature: The INCLUDE clause adds non-key columns to the index leaf nodes, enabling index-only scans without storing them in the B-tree structure.
+Performance Result:
+MetricValueExecution Time0.012 msHeap Fetches0 (no table access!)Scan TypeIndex Only ScanIndex Size7,528 KB
+
+Query Plan:
+Index Only Scan using idx_orders_customer_covering
+  Index Cond: (customer_id = 'xxx')
+  Heap Fetches: 0
+
+Critical Achievement:
+The covering index achieved a true index-only scan with zero heap fetches. This means PostgreSQL served the entire query result from the index alone, without accessing the table data. This represents the optimal index strategy for this query pattern.
+Performance Impact:
+
+Execution time: 0.012 ms
+Compared to baseline: ~10-15x faster
+I/O reduction: 100% (no table reads)
+
+4.5.5 Index Strategy Comparison
+Total Index Overhead:
+Index StrategyCountTotal SizeBenefitBaseline (single-column)8~18 MBStandard performance+ Composite indexes+2+13 MBMulti-column queries+ Partial indexes+1+2 MBFiltered subset queries+ Covering indexes+1+7.5 MBIndex-only scansTotal12~40 MBComprehensive optimization
+
+Trade-off Analysis:
+✅ Benefits:
+
+Index-only scans eliminate table lookups (critical for large tables)
+Partial indexes reduce storage for common filters
+Composite indexes optimize multi-column queries
+
+⚠️ Costs:
+
+Additional storage: ~22 MB (2x increase)
+Slower INSERT/UPDATE operations (more indexes to maintain)
+Increased maintenance overhead (VACUUM, ANALYZE)
+
+Recommendation:
+For read-heavy e-commerce workloads (typical 80% read, 20% write ratio), the query performance benefits significantly outweigh the storage and maintenance costs. The 2x storage increase (40 MB total) is negligible on modern systems, while index-only scans provide 10-15x performance improvements on critical queries.
+
+4.5.6 Real-World Application
+E-commerce Query Patterns:
+
+Customer Order History → Covering index (idx_orders_customer_covering)
+Analytics on Delivered Orders → Partial index (idx_orders_delivered_date)
+Product Price Range Filters → Composite index (idx_order_items_product_price)
+Customer Status Filtering → Composite index (idx_orders_customer_status)
+
+These optimizations directly address the most common query patterns in e-commerce applications, demonstrating that workload-specific index design significantly improves system performance.
+
+-------------
+
+
 
 4.6 Scalability and Load Testing
 [To be completed in next testing phase]

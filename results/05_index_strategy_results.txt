@@ -1,0 +1,172 @@
+Timing is on.
+=============================================
+Index Strategy Testing
+Testing various index types and strategies
+=============================================
+
+Phase 1: Baseline Performance with Current Indexes
+---------------------------------------------------
+Test 1.1: Order date range query (using current index)
+                                                                                         QUERY PLAN                                                                                         
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=101.12..2130.03 rows=7261 width=83) (actual time=1.521..11.241 rows=7269 loops=1)
+   Recheck Cond: ((order_purchase_timestamp >= '2018-01-01 00:00:00'::timestamp without time zone) AND (order_purchase_timestamp < '2018-02-01 00:00:00'::timestamp without time zone))
+   Heap Blocks: exact=1881
+   ->  Bitmap Index Scan on idx_orders_purchase_date  (cost=0.00..99.30 rows=7261 width=0) (actual time=1.139..1.139 rows=7269 loops=1)
+         Index Cond: ((order_purchase_timestamp >= '2018-01-01 00:00:00'::timestamp without time zone) AND (order_purchase_timestamp < '2018-02-01 00:00:00'::timestamp without time zone))
+ Planning Time: 1.320 ms
+ Execution Time: 11.614 ms
+(7 rows)
+
+Time: 14.002 ms
+
+Test 1.2: Customer orders by status (using current indexes)
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using idx_orders_customer_covering on orders  (cost=0.44..2.66 rows=1 width=50) (actual time=0.040..0.041 rows=1 loops=1)
+   Index Cond: ((customer_id)::text = ($0)::text)
+   Filter: ((order_status)::text = 'delivered'::text)
+   InitPlan 1 (returns $0)
+     ->  Limit  (cost=0.00..0.03 rows=1 width=33) (actual time=0.010..0.010 rows=1 loops=1)
+           ->  Seq Scan on customers  (cost=0.00..2562.41 rows=99441 width=33) (actual time=0.009..0.009 rows=1 loops=1)
+ Planning Time: 0.457 ms
+ Execution Time: 0.059 ms
+(8 rows)
+
+Time: 0.983 ms
+
+Test 1.3: Products by category and price range
+                                                                   QUERY PLAN                                                                    
+-------------------------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=579.07..4890.10 rows=4637 width=87) (actual time=2.478..31.912 rows=5370 loops=1)
+   Hash Cond: ((oi.product_id)::text = (p.product_id)::text)
+   ->  Seq Scan on order_items oi  (cost=0.00..4145.75 rows=62952 width=72) (actual time=0.004..22.661 rows=63069 loops=1)
+         Filter: ((price >= '20'::numeric) AND (price <= '100'::numeric))
+         Rows Removed by Filter: 49581
+   ->  Hash  (cost=548.74..548.74 rows=2427 width=48) (actual time=2.447..2.447 rows=2444 loops=1)
+         Buckets: 4096  Batches: 1  Memory Usage: 219kB
+         ->  Bitmap Heap Scan on products p  (cost=22.40..548.74 rows=2427 width=48) (actual time=0.194..2.074 rows=2444 loops=1)
+               Recheck Cond: ((product_category_name)::text = 'beleza_saude'::text)
+               Heap Blocks: exact=470
+               ->  Bitmap Index Scan on idx_products_category  (cost=0.00..21.79 rows=2427 width=0) (actual time=0.126..0.126 rows=2444 loops=1)
+                     Index Cond: ((product_category_name)::text = 'beleza_saude'::text)
+ Planning Time: 1.393 ms
+ Execution Time: 32.083 ms
+(14 rows)
+
+Time: 33.914 ms
+
+=============================================
+Phase 2: Create Composite Indexes
+=============================================
+Creating composite index: idx_orders_customer_status...
+psql:scripts/performance_tests/03_index_strategy_test.sql:57: ERROR:  relation "idx_orders_customer_status" already exists
+Time: 0.684 ms
+Creating composite index: idx_order_items_product_price...
+psql:scripts/performance_tests/03_index_strategy_test.sql:61: ERROR:  relation "idx_order_items_product_price" already exists
+Time: 0.094 ms
+ANALYZE
+Time: 77.428 ms
+ANALYZE
+Time: 66.889 ms
+Composite indexes created and analyzed.
+
+Phase 3: Performance with Composite Indexes
+--------------------------------------------
+Test 3.1: Customer + Status (with composite index)
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using idx_orders_customer_covering on orders  (cost=0.44..2.66 rows=1 width=50) (actual time=0.009..0.009 rows=1 loops=1)
+   Index Cond: ((customer_id)::text = ($0)::text)
+   Filter: ((order_status)::text = 'delivered'::text)
+   InitPlan 1 (returns $0)
+     ->  Limit  (cost=0.00..0.03 rows=1 width=33) (actual time=0.002..0.002 rows=1 loops=1)
+           ->  Seq Scan on customers  (cost=0.00..2562.41 rows=99441 width=33) (actual time=0.002..0.002 rows=1 loops=1)
+ Planning Time: 0.106 ms
+ Execution Time: 0.015 ms
+(8 rows)
+
+Time: 0.245 ms
+
+Test 3.2: Product + Price range (with composite index)
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=25.28..493.16 rows=324 width=72) (actual time=0.058..0.462 rows=135 loops=1)
+   ->  HashAggregate  (cost=24.86..25.86 rows=100 width=33) (actual time=0.053..0.058 rows=100 loops=1)
+         Group Key: ("ANY_subquery".product_id)::text
+         Batches: 1  Memory Usage: 32kB
+         ->  Subquery Scan on "ANY_subquery"  (cost=0.29..24.61 rows=100 width=33) (actual time=0.012..0.036 rows=100 loops=1)
+               ->  Limit  (cost=0.29..24.61 rows=100 width=33) (actual time=0.005..0.025 rows=100 loops=1)
+                     ->  Index Scan using idx_products_category on products  (cost=0.29..590.48 rows=2427 width=33) (actual time=0.005..0.021 rows=100 loops=1)
+                           Index Cond: ((product_category_name)::text = 'beleza_saude'::text)
+   ->  Index Scan using idx_order_items_product_price on order_items oi  (cost=0.42..4.64 rows=3 width=72) (actual time=0.003..0.004 rows=1 loops=100)
+         Index Cond: (((product_id)::text = ("ANY_subquery".product_id)::text) AND (price >= '20'::numeric) AND (price <= '100'::numeric))
+ Planning Time: 0.127 ms
+ Execution Time: 0.473 ms
+(12 rows)
+
+Time: 0.744 ms
+
+=============================================
+Phase 4: Partial Index Testing
+=============================================
+Creating partial index for delivered orders...
+psql:scripts/performance_tests/03_index_strategy_test.sql:111: ERROR:  relation "idx_orders_delivered_date" already exists
+Time: 0.174 ms
+ANALYZE
+Time: 71.804 ms
+Test 4.1: Delivered orders by date (with partial index)
+                                                                                                              QUERY PLAN                                                                                                               
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=74.41..2090.91 rows=5514 width=74) (actual time=0.453..1.410 rows=6351 loops=1)
+   Recheck Cond: ((order_purchase_timestamp >= '2018-08-01 00:00:00'::timestamp without time zone) AND (order_purchase_timestamp < '2018-09-01 00:00:00'::timestamp without time zone) AND ((order_status)::text = 'delivered'::text))
+   Heap Blocks: exact=1849
+   ->  Bitmap Index Scan on idx_orders_delivered_date  (cost=0.00..73.03 rows=5514 width=0) (actual time=0.319..0.319 rows=6351 loops=1)
+         Index Cond: ((order_purchase_timestamp >= '2018-08-01 00:00:00'::timestamp without time zone) AND (order_purchase_timestamp < '2018-09-01 00:00:00'::timestamp without time zone))
+ Planning Time: 0.088 ms
+ Execution Time: 1.523 ms
+(7 rows)
+
+Time: 1.726 ms
+
+=============================================
+Phase 5: Covering Index Testing
+=============================================
+Creating covering index with INCLUDE...
+psql:scripts/performance_tests/03_index_strategy_test.sql:137: ERROR:  relation "idx_orders_customer_covering" already exists
+Time: 0.167 ms
+ANALYZE
+Time: 70.958 ms
+Test 5.1: Customer orders (covering index - no table lookup)
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Index Only Scan using idx_orders_customer_covering on orders  (cost=0.44..2.66 rows=1 width=50) (actual time=0.007..0.007 rows=1 loops=1)
+   Index Cond: (customer_id = ($0)::text)
+   Heap Fetches: 0
+   InitPlan 1 (returns $0)
+     ->  Limit  (cost=0.00..0.03 rows=1 width=33) (actual time=0.002..0.002 rows=1 loops=1)
+           ->  Seq Scan on customers  (cost=0.00..2562.41 rows=99441 width=33) (actual time=0.002..0.002 rows=1 loops=1)
+ Planning Time: 0.090 ms
+ Execution Time: 0.012 ms
+(8 rows)
+
+Time: 0.220 ms
+
+=============================================
+Index Summary
+=============================================
+New indexes created:
+  tablename  |           indexname           |  size   
+-------------+-------------------------------+---------
+ order_items | idx_order_items_product       | 3384 kB
+ order_items | idx_order_items_product_price | 6528 kB
+ order_items | idx_order_items_seller        | 1336 kB
+ orders      | idx_orders_customer           | 7704 kB
+ orders      | idx_orders_customer_covering  | 7528 kB
+ orders      | idx_orders_customer_status    | 6608 kB
+ orders      | idx_orders_delivered_date     | 2128 kB
+ orders      | idx_orders_purchase_date      | 2600 kB
+ orders      | idx_orders_status             | 656 kB
+(9 rows)
+
+Time: 2.668 ms
